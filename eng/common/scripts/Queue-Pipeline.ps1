@@ -12,6 +12,9 @@ param(
   [Parameter(Mandatory = $true)]
   [int]$DefinitionId,
 
+  [Parameter(Mandatory = $false)]
+  [string]$VsoQueuedPipelines,
+
   [Parameter(Mandatory = $true)]
   [string]$AuthToken
 )
@@ -40,3 +43,13 @@ catch {
 }
 
 LogDebug "Pipeline [ $($resp.definition.name) ] queued at [ $($resp._links.web.href) ]"
+
+if ($VsoQueuedPipelines) {
+  $enVarValue = [System.Environment]::GetEnvironmentVariable($VsoQueuedPipelines)
+  if ($enVarValue)
+  {
+    $QueuedPipelineLinks = "$enVarValue<br>[$($resp.definition.name)]($($resp._links.web.href))"
+  }
+  $QueuedPipelineLinks
+  Write-Host "##vso[task.setvariable variable=VsoQueuedPipelines]$QueuedPipelineLinks"
+}
